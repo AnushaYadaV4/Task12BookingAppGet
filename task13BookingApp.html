@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-
 <html>
     <body>
-        <form onsubmit="saveToLocalStorage(event)">
+        <form  onsubmit="saveToLocalStorage(event)">
             <label> Name</label>
-            <input type="text" name="username"  required/>
+            <input id='username' type="text" name="username"  required/>
             <label> EmailId</label>
-            <input type="email" name="emailId"  required/>
+            <input id='email' type="email" name="emailId"  required/>
             <label> Phone Number</label>
-            <input type="tel" name="phonenumber" />
+            <input id='phonenumber' type="tel" name="phonenumber" />
             <button> Submit </button>
         </form>
         <ul id='listOfUsers'></ul>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
+
         <script>
             function saveToLocalStorage(event) {
                 event.preventDefault();
@@ -28,7 +28,7 @@
                     phonenumber
                 }
 
-                axios.post("https://crudcrud.com/api/e00941d96dbd42d2b44a9c3d8ee1d34e/appointmentData",obj)
+                axios.post("https://crudcrud.com/api/8aba94ae50e3417e8d3c3d6118c83ed9/appointmentData",obj)
 
                 .then((response)=>{
                       showNewUserOnScreen(response.data)
@@ -36,15 +36,14 @@
                 .catch((err)=>{
                   document.body.innerHTML=document.body.innerHTML+"<h4>Something went wrong</h4>"
                   console.log(err)
-                })    
+                }) 
                 //localStorage.setItem(obj.email, JSON.stringify(obj))
                 //showNewUserOnScreen(obj)
             }
 
             window.addEventListener("DOMContentLoaded", () => {
 
-
-              axios.get("https://crudcrud.com/api/e00941d96dbd42d2b44a9c3d8ee1d34e/appointmentData")
+                axios.get("https://crudcrud.com/api/8aba94ae50e3417e8d3c3d6118c83ed9/appointmentData")
                .then((response)=>{
                 console.log(response)
                 for(var i=0;i<response.data.length;i++){
@@ -54,8 +53,7 @@
                .catch((error)=>{
                 console.log(error)
                })
-
-                /*const localStorageObj = localStorage;
+               /* const localStorageObj = localStorage;
                 const localstoragekeys  = Object.keys(localStorageObj)
 
                 for(var i =0; i< localstoragekeys.length; i++){
@@ -67,48 +65,69 @@
             })
 
             function showNewUserOnScreen(user){
+
+                /*user={
+                    _id:"",
+                    name:"",
+                    email:""
+
+                }*/
+                document.getElementById('email').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('phonenumber').value ='';
+                // console.log(localStorage.getItem(user.emailId))
+                if(localStorage.getItem(user.email) !== null){
+                    removeUserFromScreen(user.email)
+                }
+
                 const parentNode = document.getElementById('listOfUsers');
-                const childHTML = `<li id=${user.email}> ${user.name} - ${user.email}
-                                        <button onclick=deleteUser('${user.email}')> Delete User </button>
-                                        <button onclick=editUserDetails('${user.email}','${user.name}','${user.phonenumber}')>Edit User </button>
+                const childHTML = `<li id=${user._id}> ${user.name} - ${user.email}
+                                        <button onclick=deleteUser('${user._id}')> Delete User </button>
+                                        <button onclick=editUserDetails('${user.email}','${user.name}','${user.phonenumber}','${user._id}')>Edit User </button>
                                      </li>`
 
                 parentNode.innerHTML = parentNode.innerHTML + childHTML;
             }
+
             //Edit User
 
-            function editUserDetails(emailId,name,phonenumber){
-              document.getElementById('email').value=emailId;
-              document.getElementById('username').value=name;
-              document.getElementById('phonenumber').value=phonenumber;
+            function editUserDetails(emailId, name, phonenumber,userId){
 
-              deleteUser(emailId)
-            }
+                document.getElementById('email').value = emailId;
+                document.getElementById('username').value = name;
+                document.getElementById('phonenumber').value =phonenumber;
 
+                deleteUser(userId)
+             }
 
             // deleteUser('abc@gmail.com')
 
-            function deleteUser(emailId){
-                console.log(emailId)
-                localStorage.removeItem(emailId);
-                removeUserFromScreen(emailId);
+            function deleteUser(userId){
+                axios.delete(`https://crudcrud.com/api/8aba94ae50e3417e8d3c3d6118c83ed9/appointmentData/${userId}`)
+                .then((response)=>{
+                    removeUserFromScreen(userId);
+
+                    
+                })
+                .catch((error)=>{
+                    console.log(error)
+                })
+                //console.log(emailId)
+                //localStorage.removeItem(emailId);
+                //removeUserFromScreen(emailId);
 
             }
 
-            function removeUserFromScreen(emailId){
+            function removeUserFromScreen(userId){
                 const parentNode = document.getElementById('listOfUsers');
-                const childNodeToBeDeleted = document.getElementById(emailId);
-
-                parentNode.removeChild(childNodeToBeDeleted)
-                if(childNodeToBeDeleted){
-                  parentNode.removeChild(childNodeToBeDeleted)
+                const childNodeToBeDeleted = document.getElementById(userId);
+                if(childNodeToBeDeleted) {
+                    parentNode.removeChild(childNodeToBeDeleted)
                 }
             }
-     </script>
+
+      </script>
 
 
     </body>
-
-    </html>
-
-
+</html>
